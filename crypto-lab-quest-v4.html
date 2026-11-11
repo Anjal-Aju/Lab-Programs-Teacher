@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Crypto Lab Quest</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#fff1b8;--ink:#2b2350;--card:#fff;--ok:#2ecc71;--bad:#ff4d6d;--pop:#7c4dff;color-scheme:light}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1f55;--ink:#fff7d6;--card:#3b2d7a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#2a1f55;--ink:#fff7d6;--card:#3b2d7a;color-scheme:dark}
+*{box-sizing:border-box}html,body{height:auto;margin:0}
+body{font-family:Fredoka,"Trebuchet MS",sans-serif;background:var(--bg);color:var(--ink);background-image:radial-gradient(#ffb70344 3px,transparent 3px);background-size:34px 34px;min-height:100vh}
+#app{max-width:960px;margin:auto;padding:16px 16px 120px}
+.card{background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px;margin:14px 0;animation:pop .4s}
+.btn{font:700 18px Fredoka,sans-serif;background:var(--c,var(--pop));color:#fff;border:3px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);padding:10px 20px;cursor:pointer;margin:6px 6px 6px 0;transition:.1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}.btn.alt{background:#ffd23f;color:#2b2350}
+h1,h2{margin:.2em 0}h1{font-size:34px}
+.bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.pill{background:#ffd23f;color:#2b2350;border:3px solid var(--ink);border-radius:99px;padding:2px 14px;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.node{background:var(--c);color:#fff;border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:14px;cursor:pointer;text-align:center;transition:.15s;animation:pop .5s backwards}
+.node:hover{transform:translateY(-6px) rotate(-2deg)}.node .em{font-size:44px;display:block}
+.node.lock{filter:grayscale(1);opacity:.6;cursor:not-allowed}
+.mascot{display:flex;gap:12px;align-items:center}.mascot .m{font-size:58px;animation:bob 1.6s infinite}
+.bubble{background:#fff;color:#2b2350;border:3px solid var(--ink);border-radius:18px;padding:8px 14px;font-weight:500}
+.code,.term,input.t,.ln{font-variant-ligatures:none;font-feature-settings:"liga" 0,"calt" 0}
+.code{background:#1e1b3a;color:#fff;border-radius:16px;border:3px solid var(--ink);padding:12px;font:500 15px "JetBrains Mono",monospace;overflow-x:auto}
+.ln{padding:2px 0;white-space:pre-wrap;word-break:break-all;color:#8b84c9}.ln.done{color:#5ef2a0}.ln.cur{color:#ffd23f;background:#ffffff14;border-radius:6px}
+.ln.cur span.ok{color:#5ef2a0}.ln.cur span.bad{color:#fff;background:var(--bad);border-radius:3px}
+.ln.hid,.ln.cur.blur{filter:blur(6px)}
+.hint{background:#e3f2ff;color:#2b2350;border:3px dashed #3d8bff;border-radius:14px;padding:8px 12px;margin:10px 0;font-weight:500}
+input.t{width:100%;font:700 16px "JetBrains Mono",monospace;padding:12px;border-radius:14px;border:3px solid var(--ink);background:#fff;color:#2b2350}
+.prog{height:14px;background:#0002;border-radius:9px;overflow:hidden;border:2px solid var(--ink)}.prog i{display:block;height:100%;background:var(--c);transition:.3s}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;background:#fff;color:#2b2350}.opt.ok{background:var(--ok);color:#fff;animation:pop .4s}.opt.no{background:var(--bad);color:#fff;animation:shake .4s}
+.opt.done{background:var(--ok);color:#fff;animation:none;pointer-events:none;cursor:default}
+.opt.bl-ok{animation:blinkG .26s 3}.opt.bl-bad{animation:blinkR .26s 3}
+.card.np{animation:none}
+.split{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:14px;align-items:start}.split>.card{margin:14px 0}
+.how{position:sticky;top:10px;background:#e3f2ff;color:#2b2350;border-style:dashed;border-color:#3d8bff}.how summary{cursor:pointer;font-weight:700;font-size:18px}.how p{margin:8px 0;line-height:1.45}.how code{background:#fff;border-radius:6px;padding:0 5px;font:700 13px "JetBrains Mono",monospace}
+.lang{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}.lang b{margin-right:2px}.lang .btn{margin:2px}.lang .btn.on{background:var(--pop);color:#fff}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{flex:1;min-width:90px;text-align:center;background:#ffd23f;color:#2b2350;border:3px solid var(--ink);border-radius:16px;padding:8px;font-weight:700;font-size:22px}.stat small{display:block;font-size:12px}
+ul{padding-left:20px;line-height:1.6}li b{color:var(--c)}
+.conf{position:fixed;top:-40px;font-size:28px;animation:fall 2.4s linear forwards;pointer-events:none;z-index:9}
+.bub{position:fixed;right:14px;top:96px;max-width:260px;background:#fff;color:#2b2350;border:3px solid var(--ink);border-radius:20px 20px 4px 20px;box-shadow:0 5px 0 var(--ink);padding:10px 14px;font-weight:500;z-index:8;animation:pop .35s}.bub b{display:block;color:#7c4dff}
+.term{background:#0d0b1f;color:#e8e6ff;border:3px solid var(--ink);border-radius:16px;padding:12px;font:500 14px "JetBrains Mono",monospace;white-space:pre-wrap;word-break:break-all;margin:10px 0}
+.term .in{color:#ffd23f}.term .er{color:#ff6b6b}.term .gr{color:#5ef2a0}
+.wm{position:fixed;left:8px;bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:7;pointer-events:none;display:grid;grid-template-columns:auto auto;grid-template-areas:"tag ." "face say";align-items:end;column-gap:6px;user-select:none}
+.wm .tag{grid-area:tag;justify-self:center;background:#ff4d6d;border:2px solid var(--ink);border-radius:8px;padding:2px;transform:rotate(-5deg);box-shadow:0 2px 0 var(--ink);margin-bottom:-4px;position:relative;z-index:1}
+.wm .tag b{display:block;background:#fff;color:#2b2350;border-radius:5px;padding:0 9px;font:700 14px Fredoka,sans-serif;letter-spacing:.4px}
+.wm .face{grid-area:face;justify-self:center;font-size:46px;line-height:1;animation:bob 2.2s infinite;filter:drop-shadow(0 3px 0 #0003)}
+.wm .say{grid-area:say;align-self:center;position:relative;background:#fff;color:#2b2350;border:2px solid var(--ink);border-radius:14px;padding:4px 10px;font-weight:700;font-size:13px;line-height:1.15;max-width:150px;box-shadow:0 3px 0 var(--ink);margin-bottom:4px}
+.wm .say::before{content:"";position:absolute;left:-10px;bottom:9px;border:6px solid transparent;border-right-color:var(--ink);border-left-width:4px}
+.wm .say::after{content:"";position:absolute;left:-6px;bottom:10px;border:5px solid transparent;border-right-color:#fff;border-left-width:2px}
+.inbar{position:sticky;bottom:calc(96px + env(safe-area-inset-bottom,0px));background:var(--card);padding:6px 0;z-index:5}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bob{50%{transform:translateY(-10px) rotate(6deg)}}
+@keyframes blinkG{0%,100%{background:#fff;color:#2b2350}50%{background:var(--ok);color:#fff}}
+@keyframes blinkR{0%,100%{background:#fff;color:#2b2350}50%{background:var(--bad);color:#fff}}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+@media(max-width:760px){.split{grid-template-columns:1fr}.how{order:-1;position:static}}
+@media(max-width:600px){#app{padding:10px 10px 120px}.wm .face{font-size:38px}.wm .say{font-size:11.5px;max-width:120px;padding:3px 8px}.wm .tag b{font-size:12px}h1{font-size:26px}.card{padding:12px;border-radius:18px}.btn{font-size:16px;padding:9px 14px}.code{font-size:13px;padding:8px}.term{font-size:12.5px}.bub{top:auto;bottom:calc(150px + env(safe-area-inset-bottom,0px));left:10px;right:10px;max-width:none}.mascot .m{font-size:42px}.grid{grid-template-columns:1fr 1fr;gap:10px}.node .em{font-size:34px}}
+</style></head><body><div id="app"></div><div class="wm" aria-hidden="true"><div class="tag"><b>Anjal</b></div><span class="face">😎</span><div class="say">Good luck on your exams! 🍀</div></div>
+<script>
+const T=[
+{n:"Hash Function",em:"🧮",c:"#ff6b6b",story:"A hash turns any text into one number, like a fingerprint. Ours is the simple lab version: add up the ASCII code of every character.",pts:["<b>H</b> = 72, <b>e</b> = 101 … “Hello” adds up to <b>500</b>.","The loop stops at <b>'\\0'</b>, the invisible end-of-string mark."],d:["Hello"],
+algo:["Start and read the string.","Set hash = 0.","For each character until '\\0': hash = hash + ASCII value of the character.","Print the hash value.","Stop."],
+code:String.raw`#include <stdio.h>
+int main()
+{
+  char str[100];
+  int hash = 0, i;
+  printf("Enter a string : ");
+  scanf("%s", str); ## Read one word into str.
+  for (i = 0; str[i] != '\0'; i++) ## Walk until the end-of-string mark.
+  {
+    hash += str[i]; ## Add the ASCII value of each character.
+  }
+  printf("Hash value %d\n", hash); ## Print the fingerprint.
+  return 0;
+}`,
+P:[{t:()=>"Enter a string : ",k:"s"}],f:v=>`Hash value ${hs(v[0])}\n`,
+q:[["What does this program add up?",["ASCII values of each character","Number of words","Position of each letter"],"Each character is a number (H = 72). The sum is the hash."],["The loop stops when…",["str[i] is '\\0'","i reaches 100","A space appears"],"'\\0' marks the end of every C string."],["Hash value of “Hello”?",["500","5","372"],"72 + 101 + 108 + 108 + 111 = 500."],["Why is this a weak hash?",["Different strings can give the same value (ab and ba)","It is too slow","It needs a secret key"],"Real hashes such as SHA-256 avoid easy collisions."]]},
+{n:"Substitution Cipher",em:"🔤",c:"#ff9f1c",story:"Replace every letter with another letter. In the lab version each letter moves forward by a key (1 to 25). Move backward to decrypt.",pts:["hello with key 3 becomes <b>khoor</b>.","<b>% 26</b> wraps z back to a. <b>+ 26</b> keeps decrypt positive."],d:["hello","3","1"],
+algo:["Read the message, the key (1 to 25) and the choice.","Set key = key % 26.","Take each character. Choose base 'a' or 'A'. Skip non-letters.","Encrypt: ch = (ch - base + key) % 26 + base.","Decrypt: ch = (ch - base - key + 26) % 26 + base.","Print the result."],
+code:String.raw`#include <stdio.h>
+int main()
+{
+  char message[100], ch, base;
+  int key, choice, i;
+  printf("Enter a message : ");
+  scanf("%s", message);
+  printf("Enter key (1-25) : ");
+  scanf("%d", &key);
+  key = key % 26; ## Keep the key inside 0-25.
+  printf("1.Encrypt 2.Decrypt\nEnter your choice : ");
+  scanf("%d", &choice);
+  for (i = 0; message[i] != '\0'; i++)
+  {
+    ch = message[i];
+    if (ch >= 'a' && ch <= 'z') ## Lowercase letter, base is 'a'.
+      base = 'a';
+    else if (ch >= 'A' && ch <= 'Z') ## Uppercase letter, base is 'A'.
+      base = 'A';
+    else
+      continue; ## Digits and symbols stay unchanged.
+    if (choice == 1)
+      message[i] = (ch - base + key) % 26 + base; ## Shift forward and wrap around.
+    else
+      message[i] = (ch - base - key + 26) % 26 + base; ## Shift backward. +26 avoids negatives.
+  }
+  printf("Result : %s\n", message);
+  return 0;
+}`,
+P:[{t:()=>"Enter a message : ",k:"s"},{t:()=>"Enter key (1-25) : ",k:"i"},{t:()=>"1.Encrypt 2.Decrypt\nEnter your choice : ",k:"i"}],
+f:v=>{const key=+v[1]%26;return"Result : "+[...v[0]].map(ch=>{const b=/[a-z]/.test(ch)?97:/[A-Z]/.test(ch)?65:0;if(!b)return ch;const o=ch.charCodeAt(0)-b;return String.fromCharCode(b+(((+v[2]==1?o+key:o-key+26)%26)+26)%26)}).join("")+"\n"},
+q:[["Valid key range in this program?",["1 to 25","1 to 100","0 only"],"Key 26 equals key 0, so key % 26 reduces any key."],["Encrypt “hello” with key 3?",["khoor","ifmmp","hello"],"h→k, e→h, l→o, l→o, o→r."],["Why add 26 in the decrypt formula?",["To avoid a negative number before %","To double the key","To make letters capital"],"ch - base - key can go below 0 and C’s % keeps the sign."],["What happens to digits and spaces?",["They are left unchanged","They are encrypted","They are deleted"],"The else branch uses continue, so they are skipped."]]},
+{n:"RSA",em:"🔐",c:"#2ec4b6",story:"RSA locks with a public key and opens with a private key. Multiplying two primes is easy, but splitting the result back is very hard.",pts:["p = 11, q = 17 → <b>n = 187</b>, <b>φ = 160</b>.","Public <b>(7,187)</b>, private <b>(23,187)</b>. Message 88 → <b>11</b> → 88."],d:["11 17","88"],
+algo:["Read two primes p and q.","Compute n = p × q and φ = (p-1) × (q-1).","Find e (start from 7) with gcd(e, φ) = 1.","Find d such that (e × d) % φ = 1.","Encrypt: C = m^e mod n by repeated multiplication.","Decrypt: M = C^d mod n.","Print the keys, the encrypted and the decrypted value."],
+code:String.raw`#include <stdio.h>
+int gcd(int a, int b)
+{
+  while (b != 0) ## Euclid’s method.
+  {
+    int temp = b;
+    b = a % b;
+    a = temp;
+  }
+  return a;
+}
+int main()
+{
+  int p, q, n, phi, e, d = 1, m, c = 1, r = 1, i;
+  printf("Enter two primes p and q : ");
+  scanf("%d %d", &p, &q);
+  n = p * q; ## n is part of both keys.
+  phi = (p - 1) * (q - 1); ## Euler’s totient of n.
+  for (e = 7; e < phi; e++) ## Try e = 7, 8, 9 …
+    if (gcd(e, phi) == 1) ## e must share no factor with phi.
+      break;
+  while ((e * d) % phi != 1) ## Find the inverse of e.
+    d++;
+  printf("Public key : (%d,%d)\n", e, n);
+  printf("Private key : (%d,%d)\n", d, n);
+  printf("Enter message (< %d) : ", n);
+  scanf("%d", &m);
+  for (i = 0; i < e; i++)
+    c = (c * m) % n; ## Encrypt: c = m^e mod n.
+  printf("Encrypted : %d\n", c);
+  for (i = 0; i < d; i++)
+    r = (r * c) % n; ## Decrypt: r = c^d mod n.
+  printf("Decrypted : %d\n", r);
+  return 0;
+}`,
+P:[{t:()=>"Enter two primes p and q : ",k:"ii"},{t:v=>{const K=rsa(v);return`Public key : (${K.e},${K.n})\nPrivate key : (${K.d},${K.n})\nEnter message (< ${K.n}) : `},k:"i"}],
+f:v=>{const K=rsa(v),m=+v[1];let c=1,r=1;for(let i=0;i<K.e;i++)c=c*m%K.n;for(let i=0;i<K.d;i++)r=r*c%K.n;return`Encrypted : ${c}\nDecrypted : ${r}\n`},
+q:[["With p = 11 and q = 17, what is n?",["187","160","28"],"n = p × q = 187."],["What is φ(n) here?",["160","187","27"],"(11-1) × (17-1) = 10 × 16 = 160."],["Which key encrypts in this program?",["Public key (e, n)","Private key (d, n)","φ(n)"],"Encrypt with C = m^e mod n. Decrypt with M = C^d mod n."],["Condition for choosing e?",["gcd(e, φ) = 1","e must be even","e > n"],"Only then does d (the inverse of e) exist."]]},
+{n:"Diffie-Hellman",em:"🤝",c:"#3d8bff",story:"Alice and Bob create the same secret while talking in public. Only public values travel. The private keys never leave home.",pts:["Public: <b>A = g^a mod p</b> and <b>B = g^b mod p</b>.","Secret: <b>B^a = A^b = g^ab mod p</b>. Both get 160."],d:["353","3","97","233"],
+algo:["Read prime p, primitive root g, and private keys a and b.","Alice computes her public key A = g^a mod p.","Bob computes his public key B = g^b mod p.","They exchange A and B publicly.","Alice computes the secret S1 = B^a mod p.","Bob computes the secret S2 = A^b mod p.","If S1 == S2 print Exchange successful, then print A, B and the secret."],
+code:String.raw`#include <stdio.h>
+int power(int base, int exp, int mod) ## Helper that returns base^exp mod mod.
+{
+  int result = 1, i;
+  for (i = 0; i < exp; i++)
+  {
+    result = (result * base) % mod; ## Multiply, then shrink with mod.
+  }
+  return result;
+}
+int main()
+{
+  int p, g, a, b, A, B, S1, S2;
+  printf("Enter a prime number : ");
+  scanf("%d", &p);
+  printf("Enter the primitive root of %d : ", p);
+  scanf("%d", &g);
+  printf("Enter Alice's private key : ");
+  scanf("%d", &a);
+  printf("Enter Bob's private key : ");
+  scanf("%d", &b);
+  A = power(g, a, p); ## Alice’s public key.
+  B = power(g, b, p); ## Bob’s public key.
+  S1 = power(B, a, p); ## Alice’s secret.
+  S2 = power(A, b, p); ## Bob’s secret.
+  if (S1 == S2)
+    printf("Exchange successful\n");
+  else
+    printf("Exchange failed\n");
+  printf("Alice's public key : %d\n", A);
+  printf("Bob's public key : %d\n", B);
+  printf("Shared secret : %d\n", S1);
+  return 0;
+}`,
+P:[{t:()=>"Enter a prime number : ",k:"i"},{t:v=>`Enter the primitive root of ${v[0]} : `,k:"i"},{t:()=>"Enter Alice's private key : ",k:"i"},{t:()=>"Enter Bob's private key : ",k:"i"}],
+f:v=>{const[p,g,a,b]=v.map(Number);if(p<=0)throw new Error("Floating point exception: p must be a positive prime.");if(p>46340)throw new Error("p is too big: result * base overflows int. Use p < 46340.");const A=pw(g,a,p),B=pw(g,b,p),S1=pw(B,a,p),S2=pw(A,b,p);return`${S1==S2?"Exchange successful":"Exchange failed"}\nAlice's public key : ${A}\nBob's public key : ${B}\nShared secret : ${S1}\n`},
+q:[["What travels over the open network?",["Public keys A and B","Private keys a and b","Nothing"],"Only A and B are sent. a and b stay private."],["Why do both sides get the same secret?",["(g^a)^b = (g^b)^a mod p","They choose the same private key","A server tells them"],"Exponents multiply in either order."],["What is p in this program?",["A prime modulus","The secret key","The message"],"All the arithmetic is done mod p."],["What is hard for an eavesdropper?",["Finding a from g, p and A","Finding p","Finding g"],"This is the discrete logarithm problem."]]},
+{n:"DES (Feistel)",em:"🧱",c:"#9b5de5",story:"DES scrambles a block with 16 Feistel rounds and a key. Decrypting is the same rounds with the subkeys in reverse. Our lab version needs no libraries.",pts:["Block split into <b>L</b> and <b>R</b>. Each round: <b>R = L ^ F(R, key)</b>, <b>L = old R</b>.","Real DES: <b>64-bit block, 56-bit key, 16 rounds</b>."],d:["crypto!!","mykey123"],
+algo:["Read an 8-character plaintext and an 8-character key.","Make 16 subkeys from the key.","Split the 64-bit block into left L and right R halves.","Repeat 16 rounds: new R = L XOR F(R, subkey), new L = old R.","Swap L and R. This is the ciphertext; print it in hex.","Decrypt by running the same rounds with the subkeys reversed.","Print the decrypted text."],
+code:String.raw`#include <stdio.h>
+#include <string.h>
+unsigned int F(unsigned int r, unsigned int k) ## Round function: rotate left 5 bits, XOR the subkey.
+{
+  return ((r << 5) | (r >> 27)) ^ k;
+}
+void crypt8(unsigned int *L, unsigned int *R, unsigned int k[], int dec) ## dec = 1 means decrypt.
+{
+  unsigned int t;
+  int i;
+  for (i = 0; i < 16; i++) ## 16 Feistel rounds.
+  {
+    t = *R; ## Remember the old right half.
+    *R = *L ^ F(*R, k[dec ? 15 - i : i]); ## New R = L XOR F(R, key). Keys reversed to decrypt.
+    *L = t; ## New L = old R.
+  }
+  t = *L; ## Final swap of the halves.
+  *L = *R;
+  *R = t;
+}
+int main()
+{
+  char text[9], keystr[9], out[9];
+  unsigned int L, R, k[16];
+  int i;
+  printf("Enter 8 character plaintext : ");
+  scanf("%8s", text);
+  printf("Enter 8 character key : ");
+  scanf("%8s", keystr);
+  if (strlen(text) != 8 || strlen(keystr) != 8)
+  {
+    printf("Need exactly 8 characters\n");
+    return 1;
+  }
+  for (i = 0; i < 16; i++)
+    k[i] = keystr[i % 8] * (i + 1); ## Build the 16 subkeys.
+  memcpy(&L, text, 4); ## Left half = first 4 bytes.
+  memcpy(&R, text + 4, 4); ## Right half = last 4 bytes.
+  crypt8(&L, &R, k, 0);
+  printf("Ciphertext : %08x%08x\n", L, R);
+  crypt8(&L, &R, k, 1);
+  memcpy(out, &L, 4);
+  memcpy(out + 4, &R, 4);
+  out[8] = '\0';
+  printf("Decrypted : %s\n", out);
+  return 0;
+}`,
+P:[{t:()=>"Enter 8 character plaintext : ",k:"s8"},{t:()=>"Enter 8 character key : ",k:"s8"}],
+f:v=>{if(v[0].length!=8||v[1].length!=8)return"Need exactly 8 characters\n";const K=[...Array(16)].map((_,i)=>u(v[1].charCodeAt(i%8)*(i+1)));let[L,R]=fe(w4(v[0],0),w4(v[0],4),K,0);const c=hx(L)+hx(R);[L,R]=fe(L,R,K,1);return`Ciphertext : ${c}\nDecrypted : ${b4(L)+b4(R)}\n`},
+q:[["What kind of cipher is DES?",["A Feistel block cipher","A stream cipher","A hash function"],"It splits each block into two halves and mixes them round by round."],["How many rounds does DES use?",["16","8","10"],"16 rounds, each with its own subkey."],["How do we decrypt?",["Same rounds, subkeys in reverse order","A completely different algorithm","Add instead of XOR"],"That is the beauty of a Feistel network."],["Real DES block and key size?",["64-bit block, 56-bit key","128-bit block, 128-bit key","32-bit block, 32-bit key"],"The 8-byte key has 8 parity bits, leaving 56 real bits."]]},
+{n:"Digital Signature",em:"✍️",c:"#f15bb5",story:"A signature proves who sent a message and that it was not changed. Sign with the private key, verify with the public key. Our lab version is a tiny DSA with small numbers.",pts:["Fixed values <b>p = 283, q = 47, g = 60</b>. Hash = ASCII sum % q.","Signature is <b>(r, s)</b>. It is valid when <b>v == r</b>."],d:["Hello","3","5"],
+algo:["Fix p, q, g. Read the message, private key x and random k.","Hash the message: h = (sum of ASCII) % q.","Public key y = g^x mod p.","Signing: r = (g^k mod p) % q and s = k⁻¹ (h + x·r) % q.","Verifying: w = s⁻¹, u1 = h·w % q, u2 = r·w % q.","Compute v = ((g^u1 · y^u2) % p) % q.","If v == r the signature is verified (true), else false."],
+code:String.raw`#include <stdio.h>
+int power(int b, int e, int m) ## Returns b^e mod m.
+{
+  int r = 1, i;
+  for (i = 0; i < e; i++)
+    r = (r * b) % m;
+  return r;
+}
+int inv(int a, int q) ## Modular inverse by trial.
+{
+  int i;
+  for (i = 1; i < q; i++)
+    if ((a * i) % q == 1)
+      return i;
+  return 0;
+}
+int main()
+{
+  int p = 283, q = 47, g = 60;
+  int x, k, y, h = 0, r, s, w, u1, u2, v, i;
+  char msg[100];
+  printf("Enter message : ");
+  scanf("%s", msg);
+  printf("Enter private key x (1-46) : ");
+  scanf("%d", &x);
+  printf("Enter random k (1-46) : ");
+  scanf("%d", &k);
+  for (i = 0; msg[i] != '\0'; i++)
+    h += msg[i]; ## Hash = sum of ASCII values.
+  h = h % q;
+  y = power(g, x, p); ## Public key.
+  r = power(g, k, p) % q; ## First half of the signature.
+  s = (inv(k, q) * (h + x * r)) % q; ## Second half, signed with x.
+  printf("Signature : (%d,%d)\n", r, s);
+  w = inv(s, q); ## Verification starts here.
+  u1 = (h * w) % q;
+  u2 = (r * w) % q;
+  v = ((power(g, u1, p) * power(y, u2, p)) % p) % q; ## v is rebuilt using only the public key.
+  if (v == r)
+    printf("Signature verified: true\n");
+  else
+    printf("Signature verified: false\n");
+  return 0;
+}`,
+P:[{t:()=>"Enter message : ",k:"s"},{t:()=>"Enter private key x (1-46) : ",k:"i"},{t:()=>"Enter random k (1-46) : ",k:"i"}],
+f:v=>{const p=283,q=47,g=60,x=+v[1],k=+v[2],iv=a=>{for(let i=1;i<q;i++)if(a*i%q==1)return i;return 0},h=hs(v[0])%q,y=pw(g,x,p),r=pw(g,k,p)%q,s=iv(k)*(h+x*r)%q,w=iv(s),u1=h*w%q,u2=r*w%q,vv=pw(g,u1,p)*pw(y,u2,p)%p%q;return`Signature : (${r},${s})\nSignature verified: ${vv==r}\n`},
+q:[["You sign a message with…",["The private key x","The public key y","Nothing"],"Only the owner knows x, so only the owner can sign."],["Verification uses…",["The public key y","The private key x","The value k"],"Anyone can verify with y. That is the point."],["What does a signature give us?",["Authenticity and integrity","Secrecy of the message","Compression"],"It proves who signed and that nothing changed."],["Why must k be random and never reused?",["Reusing k can leak the private key","k is a hash","It makes it faster"],"Two signatures with the same k reveal x."]]},
+{n:"LSB Steganography",em:"🕵️",c:"#00b86b",story:"Hide a secret inside a picture! Change only the last bit of each pixel byte. Your eyes can’t tell, but the bits spell your message.",pts:["A BMP has a <b>54-byte header</b>. Copy it, never edit it.","<b>(p &amp; 254)</b> clears the last bit. <b>| bit</b> puts ours there. 8 chars need <b>64 bytes</b>."],d:["HELLO123"],
+algo:["Read a message of up to 8 characters.","Open input.bmp for reading and stego.bmp for writing.","Copy the 54-byte header unchanged.","For every bit of the message, read one pixel byte.","Clear its last bit and set it to the message bit: (p & 254) | bit.","Copy the remaining image data until EOF.","Reopen stego.bmp and jump over the 54-byte header.","Collect the last bit of 64 bytes into 8 characters and print them."],
+code:String.raw`#include <stdio.h>
+int main()
+{
+  FILE *in, *out;
+  int p, i, j;
+  char msg[9], ext[9];
+  printf("Enter message (max 8 chars): ");
+  scanf("%8s", msg);
+  in = fopen("input.bmp", "rb");
+  out = fopen("stego.bmp", "wb");
+  if (!in || !out) ## Stop if a file could not be opened.
+  {
+    printf("File error!\n");
+    return 1;
+  }
+  for (i = 0; i < 54; i++)
+    fputc(fgetc(in), out); ## Copy the BMP header.
+  for (i = 0; i < 8; i++) ## For every character…
+  {
+    for (j = 7; j >= 0; j--) ## …and every bit, left to right.
+    {
+      p = fgetc(in); ## Read one pixel byte.
+      p = (p & 254) | ((msg[i] >> j) & 1); ## Replace its last bit with a message bit.
+      fputc(p, out);
+    }
+  }
+  while ((p = fgetc(in)) != EOF)
+    fputc(p, out); ## Copy the rest of the image.
+  fclose(in);
+  fclose(out);
+  in = fopen("stego.bmp", "rb");
+  fseek(in, 54, SEEK_SET); ## Jump over the header.
+  for (i = 0; i < 8; i++)
+  {
+    ext[i] = 0;
+    for (j = 7; j >= 0; j--)
+    {
+      p = fgetc(in);
+      ext[i] |= (p & 1) << j; ## Rebuild each character from last bits.
+    }
+  }
+  ext[8] = '\0';
+  fclose(in);
+  printf("Stego image created: stego.bmp\n");
+  printf("Extracted message: %s\n", ext);
+  return 0;
+}`,
+P:[{t:()=>"Enter message (max 8 chars): ",k:"s8"}],f:v=>`Stego image created: stego.bmp\nExtracted message: ${v[0]}\n`,
+q:[["Why do we copy the first 54 bytes untouched?",["It is the BMP header, not pixels","It stores the message","It is padding"],"Changing the header would corrupt the image."],["What does (p & 254) do?",["Clears the last bit","Sets the last bit","Reverses all bits"],"254 = 11111110. AND wipes the LSB so ours fits."],["Why is the change invisible?",["A colour value changes by at most 1","The image is encrypted","The image is compressed"],"A shift of 1 out of 256 shades can’t be seen."],["Bytes needed to hide 8 characters?",["64","8","16"],"8 characters × 8 bits = 64 bits, one bit per byte."]]}
+];
+const JV={
+pts:["Algorithm <b>SHA256withDSA</b>, 1024-bit key.","Flow: <b>generate keys → sign → verify</b>. Same message gives <b>true</b>, a changed message gives <b>false</b>."],d:["Hello","Hello"],
+algo:["Read the message and the message to verify.","Create a DSA key generator and set the key size to 1024 bits.","Generate the key pair: a public key and a private key.","Create a SHA256withDSA signature object.","Sign: initSign with the private key, update with the message, then call sign().","Verify: initVerify with the public key and update with the message to verify.","Print verify(): true if the message matches the signature, else false."],
+code:String.raw`import java.security.*; ## Java crypto package.
+import java.util.Scanner; ## For keyboard input.
+public class Dsa
+{
+  public static void main(String[] args) throws Exception
+  {
+    Scanner sc = new Scanner(System.in);
+    System.out.print("Enter message : ");
+    String msg = sc.next(); ## Message to sign.
+    System.out.print("Enter message to verify : ");
+    String chk = sc.next(); ## Message the receiver checks.
+    KeyPairGenerator g = KeyPairGenerator.getInstance("DSA"); ## Key factory.
+    g.initialize(1024); ## Key size in bits.
+    KeyPair kp = g.generateKeyPair(); ## Public and private key.
+    Signature s = Signature.getInstance("SHA256withDSA"); ## Signer that hashes with SHA-256.
+    s.initSign(kp.getPrivate()); ## Sign with the private key.
+    s.update(msg.getBytes()); ## Feed the message.
+    byte[] sig = s.sign(); ## The signature bytes.
+    System.out.println("Signature generated");
+    s.initVerify(kp.getPublic()); ## Verify with the public key.
+    s.update(chk.getBytes()); ## Feed the message to check.
+    System.out.println("Signature verified: " + s.verify(sig)); ## true only if the message is unchanged.
+  }
+}`,
+P:[{t:()=>"Enter message : ",k:"s"},{t:()=>"Enter message to verify : ",k:"s"}],
+f:v=>`Signature generated\nSignature verified: ${v[0]===v[1]}\n`,
+q:[["You sign with…",["The private key","The public key","A shared secret"],"Sign with the private key. Anyone verifies with the public key."],["verify() gives true when…",["Message and signature match the public key","The message is encrypted","The key is 1024 bits"],"Change one letter of the message and it becomes false."],["What does SHA256withDSA mean?",["Hash the message with SHA-256, then sign with DSA","Encrypt the message with SHA-256","Sign twice with two keys"],"The message is hashed first, then the hash is signed."],["Why can the signature differ on every run?",["Each run makes a new random key pair","The message changes","verify() changes it"],"KeyPairGenerator creates fresh keys each time, so the printed result is the same but the signature bytes are not."]]};
+const HOWJ=`<p>This is the same idea as the C version, but Java's <code>java.security</code> package does the maths for us.</p><p>First the program reads two words: the <b>message</b> to sign and the <b>message to verify</b>.</p><p><code>KeyPairGenerator</code> makes a fresh <b>public key and private key</b> (1024 bits). A <code>Signature</code> object of type <code>SHA256withDSA</code> hashes the message with SHA-256 and signs the hash.</p><p><b>Signing:</b> <code>initSign(private key)</code>, <code>update(message)</code>, then <code>sign()</code> gives the signature bytes.<br><b>Verifying:</b> <code>initVerify(public key)</code>, <code>update(message to verify)</code>, then <code>verify(sig)</code>.</p><p><b>Example:</b> Hello and Hello → <b>true</b>. Hello and Hellp → <b>false</b>, because the message was changed.</p>`;
+let lang="c",scr=intro;
+const V=()=>t==5&&lang=="java"?Object.assign({},T[t],JV):T[t];
+const hw=()=>t==5&&lang=="java"?HOWJ:HOW[t];
+const langBar=()=>t!=5?"":`<div class="lang"><b>Language:</b><button class="btn ${lang=="c"?"on":"alt"}" onclick="setLang('c')">C</button><button class="btn ${lang=="java"?"on":"alt"}" onclick="setLang('java')">Java</button></div>`;
+function setLang(l){lang=l;scr()}
+const app=document.getElementById("app"),$=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const hs=s=>[...s].reduce((a,c)=>a+c.charCodeAt(0),0),pw=(b,e,p)=>{let r=1;for(let i=0;i<e;i++)r=r*b%p;return r},gcd=(a,b)=>b?gcd(b,a%b):a;
+const rsa=v=>{const[p,q]=v[0].split(/\s+/).map(Number),n=p*q,phi=(p-1)*(q-1);let e=7;for(;e<phi;e++)if(gcd(e,phi)==1)break;if(e>=phi)throw new Error("No valid e found, so the C program loops forever. Use bigger primes (Ctrl+C in a real terminal).");if(n>46340)throw new Error("n is too big: c * m overflows int. Use p * q below 46340.");let d=1;while(e*d%phi!=1)d++;return{e,d,n}};
+const u=x=>x>>>0,F=(r,k)=>u(((r<<5)|(r>>>27))^k),hx=x=>x.toString(16).padStart(8,"0");
+const fe=(L,R,K,d)=>{for(let i=0;i<16;i++){const t=R;R=u(L^F(R,K[d?15-i:i]));L=t}return[R,L]};
+const w4=(s,o)=>u(s.charCodeAt(o)|s.charCodeAt(o+1)<<8|s.charCodeAt(o+2)<<16|s.charCodeAt(o+3)<<24),b4=x=>String.fromCharCode(x&255,(x>>>8)&255,(x>>>16)&255,x>>>24);
+const nz=s=>s.replace(/[\u201c\u201d]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/\s+/g,"");
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const say=["Let’s crack it! 🔥","You’re a code wizard!","Fingers ready? ⌨️","Tiny steps, big skills!","Exam? Easy peasy!"];
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const HOW=[
+`<p>The program keeps a running total called <code>hash</code> and starts it at <b>0</b>.</p><p>It then walks through the word one letter at a time. Every letter is secretly a number (its <b>ASCII code</b>), and that number is added to the total.</p><p>When it reaches the invisible end mark <code>'\\0'</code> it stops and prints the total.</p><p><b>Example:</b> Hello = 72 + 101 + 108 + 108 + 111 = <b>500</b></p><p><b>Flow:</b> read the word → set hash to 0 → loop and add → print → stop.</p>`,
+`<p>Each letter slides forward in the alphabet by the <b>key</b>. With key 3, a becomes d. At the end of the alphabet it wraps around (z → c). That wrap is the <code>% 26</code>.</p><p>First the program reads the message, the key and your choice (encrypt or decrypt), and shrinks the key with <code>key % 26</code>.</p><p>Then it looks at each character. Capital letters use base <code>'A'</code>, small letters use <code>'a'</code>, and spaces or digits are skipped.</p><p>Encrypt moves forward. Decrypt moves backward, and the <code>+ 26</code> stops the number going negative.</p><p><b>Example:</b> hello with key 3 → <b>khoor</b></p>`,
+`<p>RSA uses two keys. Anything locked with the public key can only be opened with the private key.</p><p>1. Read two primes <b>p</b> and <b>q</b>.<br>2. Multiply them: <b>n = p × q</b>, and compute <b>φ = (p-1)(q-1)</b>.<br>3. Find the public number <b>e</b>. It must share no common factor with φ (gcd = 1). Start trying from 7.<br>4. Find the private number <b>d</b> so that <code>(e × d) % φ = 1</code>.<br>5. Lock a message: <code>C = m^e mod n</code>. Unlock it: <code>M = C^d mod n</code>.</p><p><b>Example:</b> p = 11, q = 17 → n = 187, φ = 160, e = 7, d = 23. Message 88 → 11 → 88 again.</p>`,
+`<p>Alice and Bob want the same secret number, but they can only talk in public.</p><p>They agree on a public prime <b>p</b> and a root <b>g</b>. Each keeps a private number: Alice has <b>a</b>, Bob has <b>b</b>.</p><p>Alice sends <code>A = g^a mod p</code>. Bob sends <code>B = g^b mod p</code>. These two travel in the open.</p><p>Alice mixes Bob's number with her private key: <code>S1 = B^a mod p</code>. Bob does <code>S2 = A^b mod p</code>. Maths makes both equal <code>g^(ab) mod p</code>.</p><p>If S1 == S2 the exchange worked.</p><p><b>Example:</b> p = 353, g = 3, a = 97, b = 233 → secret <b>160</b></p>`,
+`<p>DES scrambles one 8-character block (64 bits) with an 8-character key.</p><p>First the key is turned into <b>16 subkeys</b>, one per round. The block is split into a left half <b>L</b> and a right half <b>R</b>.</p><p>In each of the 16 rounds: <code>new R = L XOR F(R, subkey)</code> and <code>new L = old R</code>. After the last round L and R are swapped, and that is the ciphertext (printed in hex).</p><p>To decrypt, run the <b>same rounds</b> with the subkeys in <b>reverse order</b>. That undoes the scrambling and gives the plaintext back.</p>`,
+`<p>A signature proves who sent a message and that it was not changed.</p><p>The program uses small fixed numbers <b>p, q, g</b>, then reads the message, your private key <b>x</b> and a random <b>k</b>.</p><p>The message is squashed into a small number <code>h = (sum of ASCII) % q</code>. The public key is <code>y = g^x mod p</code>.</p><p><b>Signing</b> uses the private key to make the pair <b>(r, s)</b>.<br><b>Verifying</b> uses only public values to work out <code>v</code>.</p><p>If <code>v == r</code> the signature is genuine (true). Otherwise it is false.</p>`,
+`<p>A BMP picture is a <b>54-byte header</b> followed by pixel bytes. Changing the last bit of a pixel byte changes the colour so little that nobody can see it, so we hide our message bits there.</p><p>The program reads up to 8 characters (8 × 8 = 64 bits), opens <code>input.bmp</code> and <code>stego.bmp</code>, and copies the header unchanged.</p><p>For each message bit it reads one pixel byte, clears the last bit with <code>p &amp; 254</code> and puts our bit in with <code>| bit</code>. The rest of the image is copied as it is.</p><p>To read the message back, it skips the header, collects the last bit of 64 bytes and joins them into 8 characters.</p>`
+];
+let P={xp:0};try{P=Object.assign(P,JSON.parse(localStorage.getItem("cq2")||"{}"))}catch(e){}
+const save=()=>{try{localStorage.setItem("cq2",JSON.stringify(P))}catch(e){}};
+let r=1,t=0,L,li,err,peeks,tot,pk,prev,qi,sc,QS,pool,ans,rv,aw=0,msg='';
+const st=(R,i)=>P["s"+R+i]||0,star=n=>"⭐".repeat(n)||"☆☆☆";
+const unlocked=()=>true;
+const mas=m=>`<div class="mascot"><span class="m">🐙</span><div class="bubble">${m}</div></div>`;
+const hdr=()=>`<div class="bar"><button class="btn alt" onclick="map()">🗺️ Map</button><span class="pill">Round ${r}${r==2?" · Memory":""}</span><span class="pill">⚡ ${P.xp} XP</span></div>`;
+function map(){
+  app.innerHTML=`<h1>🐙 Crypto Lab Quest</h1>${mas(rnd(say))}
+  <div class="bar"><div><button class="btn ${r==1?"":"alt"}" onclick="r=1;map()">Round 1 · Learn</button><button class="btn ${r==2?"":"alt"}" onclick="${unlocked()?"r=2;map()":"alert('Finish Round 1 first!')"}">${unlocked()?"":"🔒 "}Round 2 · Memorize</button></div><span class="pill">⚡ ${P.xp} XP</span></div>
+  <div class="grid">${T.map((x,i)=>`<div class="node" style="--c:${x.c};animation-delay:${i*.06}s" onclick="go(${i})"><span class="em">${x.em}</span><b>${i+1}. ${x.n}</b><div>${star(st(r,i))}</div></div>`).join("")}</div>`}
+function go(i){t=i;lang="c";r==2?typ():intro()}
+function tx(x,vals){let s="",v=[];for(let i=0;i<x.P.length;i++){s+=esc(x.P[i].t(v))+`<span class="in">${esc(vals[i])}</span>\n`;v.push(vals[i])}return s+esc(x.f(v))}
+function intro(){scr=intro;const x=V();
+  app.innerHTML=`${hdr()}<div class="card" style="--c:${x.c}"><h2>${x.em} ${x.n}</h2>${mas(x.story)}${langBar()}<ul>${x.pts.map(p=>`<li>${p}</li>`).join("")}</ul><b>📺 Example run</b><div class="term"><span class="gr">$ ${t==5&&lang=="java"?"java Dsa":"./prog"}</span>\n${tx(x,x.d)}</div><p>Yellow text is what the user types.</p><button class="btn" onclick="algo()">Algorithm puzzle 🧩</button></div>`}
+function algo(){scr=algo;const x=V();pool=shuf(x.algo.map((_,i)=>i));if(pool.every((v,i)=>v==i))pool.reverse();ans=[];aw=0;msg="Pick the step that happens first.";drawA(-1)}
+function drawA(last){const x=V();
+  app.innerHTML=`${hdr()}<div class="split"><div class="card np" style="--c:${x.c}"><h2>🧩 ${x.n}: sort the algorithm</h2>${langBar()}<p>Tap the step that comes next. A wrong tap blinks red. A right tap blinks green and locks in.</p><b>Your order</b><div>${ans.map((s,p)=>`<div class="btn opt done ${p==last?"bl-ok":""}">${p+1}. ${esc(x.algo[s])}</div>`).join("")||"<i>Nothing yet…</i>"}</div>
+  ${pool.length?`<div id="st" class="hint">${msg}</div><b>Jumbled steps</b><div>${pool.map(s=>`<button class="btn opt" onclick="pik(${s},this)">${esc(x.algo[s])}</button>`).join("")}</div><button class="btn alt" onclick="typ()">Skip puzzle ⏭</button>`:`<div class="hint">🎉 Perfect order${aw?` (${aw} wrong tap${aw>1?"s":""})`:" with no mistakes"}! Read it once more, then code it.</div><button class="btn" onclick="typ()">Code it ⌨️</button>`}</div>
+  <details class="card how np" open><summary>💡 How this program works</summary>${hw()}</details></div>`}
+function pik(s,el){
+  if(s===ans.length){pool=pool.filter(x=>x!=s);ans.push(s);msg=`✅ Step ${ans.length} is right! Pick the next one.`;drawA(ans.length-1);if(!pool.length)boom()}
+  else{aw++;el.classList.remove("bl-bad");void el.offsetWidth;el.classList.add("bl-bad");$("#st").innerHTML=`❌ Not that one (${aw} wrong so far). Use the explanation to work out what comes next.`}}
+function typ(){scr=typ;const x=V();
+  L=x.code.split("\n").map(l=>{const[c,h]=l.split(" ## ");return{ind:c.search(/\S/),c:c.trim(),h:h||""}});
+  li=0;err=0;peeks=0;pk=false;prev=0;tot=L.reduce((a,l)=>a+l.c.length,0);
+  app.innerHTML=`${hdr()}<div class="card" style="--c:${x.c}"><div class="bar"><h2>${x.em} ${x.n}</h2><span id="cnt" class="pill"></span></div>${langBar()}<div class="prog"><i id="pg"></i></div><div id="code" class="code" style="margin-top:10px"></div><div id="hint" class="hint"></div>
+  <div class="inbar"><input id="inp" class="t" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Type the glowing line (spaces optional)"></div>
+  ${r==2?`<button class="btn alt" onclick="pk=true;peeks++;paint()">👀 Peek (−4%)</button>`:""}<button class="btn alt" onclick="run()">Skip code ⏭</button></div>`;
+  $("#code").onclick=()=>$("#inp").focus();$("#inp").oninput=inp;paint();$("#inp").focus()}
+function paint(){let h="";
+  L.forEach((l,i)=>{const s=`style="padding-left:${Math.min(l.ind,8)*8}px"`;
+    h+=i<li?`<div class="ln done" ${s}>${esc(l.c)}</div>`:i==li?`<div class="ln cur ${r==2&&!pk?"blur":""}" ${s}>${[...l.c].map(c=>`<span>${esc(c)}</span>`).join("")}</div>`:`<div class="ln ${r==2?"hid":""}" ${s}>${esc(l.c)}</div>`});
+  $("#code").innerHTML=h;let hh="";for(let i=li;i>=0&&!hh;i--)hh=L[i].h;
+  $("#hint").innerHTML="💡 "+esc(hh||"Type line by line. It moves on by itself. Spaces are optional here.");
+  $("#pg").style.width=(100*li/L.length)+"%";$("#pg").style.background=T[t].c;$("#cnt").textContent=`Line ${li+1}/${L.length}`}
+function bub(h){if(!h)return;document.querySelectorAll(".bub").forEach(e=>e.remove());const e=document.createElement("div");e.className="bub";e.innerHTML="<b>🐙 Explained</b>"+esc(h);document.body.appendChild(e);setTimeout(()=>e.remove(),4500)}
+function inp(){const l=L[li],v=nz($("#inp").value),w=nz(l.c);let k=0;
+  document.querySelectorAll(".cur span").forEach((s,i)=>{if(/\s/.test(l.c[i])){s.className=k<=v.length?"ok":"";return}s.className=k<v.length?(v[k]==w[k]?"ok":"bad"):"";k++});
+  if(v.length>prev&&v[v.length-1]!=w[v.length-1])err++;prev=v.length;
+  if(v===w){bub(l.h);li++;prev=0;pk=false;$("#inp").value="";li>=L.length?fin():paint()}}
+function fin(){const acc=Math.round(100*tot/(tot+err)),s=acc-peeks*4,n=s>=95?3:s>=85?2:1;
+  P["s"+r+t]=Math.max(st(r,t),n);P.xp+=n*10;save();boom();
+  app.innerHTML=`${hdr()}<div class="card"><h2>🎉 Program typed!</h2><div class="stats"><div class="stat">${err}<small>Mistakes</small></div><div class="stat">${acc}%<small>Accuracy</small></div><div class="stat">${star(n)}<small>Stars</small></div></div><p>Now compile and run it with your own inputs.</p><button class="btn" style="--c:#00b86b" onclick="run()">▶ Run program</button><button class="btn alt" onclick="typ()">Type again 🔁</button></div>`}
+const PH={s:"one word, e.g. Hello",s8:"exactly 8 characters",i:"a whole number",ii:"two numbers, e.g. 11 17"};
+function run(){scr=run;rv=[];term()}
+function term(){const x=V(),jv=t==5&&lang=="java";let s=jv?`<span class="gr">$ javac Dsa.java\n✔ compiled with 0 errors\n$ java Dsa</span>\n`:`<span class="gr">$ gcc prog.c -o prog\n✔ compiled with 0 errors\n$ ./prog</span>\n`,fin2=false;
+  try{for(let i=0;i<rv.length;i++)s+=esc(x.P[i].t(rv.slice(0,i)))+`<span class="in">${esc(rv[i])}</span>\n`;
+    if(rv.length<x.P.length)s+=esc(x.P[rv.length].t(rv));else{s+=esc(x.f(rv));fin2=true}
+  }catch(e){s+=`<span class="er">⚠ ${esc(e.message)}</span>\n`;fin2=true}
+  app.innerHTML=`${hdr()}<div class="card" style="--c:${x.c}"><h2>▶ ${x.n}</h2>${langBar()}<div class="term">${s}</div>${fin2?`<button class="btn alt" onclick="run()">Run again 🔁</button><button class="btn" onclick="quiz()">Viva quiz 🎤</button>`:`<div class="inbar"><input id="ti" class="t" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="${PH[x.P[rv.length].k]}" onkeydown="if(event.key=='Enter')sub()"></div><button class="btn" onclick="sub()">Enter ⏎</button>`}</div>`;
+  const ti=$("#ti");if(ti)ti.focus()}
+function sub(){const x=V(),k=x.P[rv.length].k,ti=$("#ti"),v=ti.value.trim();if(!v)return;
+  if((k=="i"&&!/^-?\d+$/.test(v))||(k=="ii"&&!/^-?\d+\s+-?\d+$/.test(v))){ti.style.background="#ffb3c1";ti.value="";ti.placeholder="⚠ scanf needs numbers here";return}
+  let w=v.split(/\s+/)[0];if(k=="s8")w=w.slice(0,8);rv.push(k=="ii"?v.replace(/\s+/," "):k=="i"?String(+v):w);term()}
+function quiz(){qi=0;sc=0;QS=shuf(V().q);q()}
+function q(){const x=V(),Q=QS[qi];
+  app.innerHTML=`${hdr()}<div class="card" style="--c:${x.c}"><span class="pill">Viva ${qi+1}/${QS.length}</span><h2>${Q[0]}</h2><div>${shuf([0,1,2]).map(i=>`<button class="btn opt" data-i="${i}" onclick="pick(${i})">${Q[1][i]}</button>`).join("")}</div><div id="ex"></div><button class="btn alt" onclick="done(1)">Skip viva ⏭</button></div>`}
+function pick(i){const Q=QS[qi];
+  document.querySelectorAll(".opt").forEach(e=>{e.disabled=true;const j=+e.dataset.i;if(j==0)e.classList.add("ok");else if(j==i)e.classList.add("no")});
+  if(i==0){sc++;P.xp+=5;save()}
+  $("#ex").innerHTML=`<div class="hint">${i==0?"✅ Correct! ":"❌ Not quite. "}${Q[2]}</div><button class="btn" onclick="${qi+1<QS.length?"qi++;q()":"done()"}">Next ➡️</button>`}
+function done(sk){boom();const nx=t+1<T.length;
+  app.innerHTML=`${hdr()}<div class="card"><h2>🏆 ${T[t].n} complete!</h2>${mas(rnd(say))}<p>${sk?"Viva skipped.":`Viva score: ${sc}/${QS.length}.`} Total ${P.xp} XP.</p>
+  ${nx?`<button class="btn" onclick="go(${t+1})">Next: ${T[t+1].em} ${T[t+1].n}</button>`:`<p>🎓 All 7 done! ${r==1?"Round 2 (Memory mode) is open. The code is hidden, so recall it from the hints.":"You’re exam ready!"}</p>`}<button class="btn alt" onclick="map()">Back to map</button></div>`}
+function boom(){for(let i=0;i<26;i++){const e=document.createElement("span");e.className="conf";e.textContent=rnd(["🎉","⭐","✨","🔐","💥"]);e.style.left=Math.random()*100+"vw";e.style.animationDelay=Math.random()*.6+"s";document.body.appendChild(e);setTimeout(()=>e.remove(),3200)}}
+map();
+</script></body></html>
